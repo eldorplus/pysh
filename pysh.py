@@ -502,11 +502,13 @@ class Pysh(cmd.Cmd):
         gen_args = args[0].split()
         self.save_history("ps " + " ".join(gen_args))
         if not gen_args:
+            print("{:<7} {:<50}".format('PID','NAME'))
+            print("---     ----")
             for proc in psutil.process_iter():
                 try:
                     process_name = proc.name()
                     process_id = proc.pid
-                    print(process_name, ":::", process_id)
+                    print("{:<7} {:<50}".format(process_id, process_name))
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     print("Internal Error")
 
@@ -831,7 +833,7 @@ class Pysh(cmd.Cmd):
     def help_chmod(self):
         print(commands_list_manual['chmod'])
 
-    def default(self, line: str) -> bool:
+    def default(self, line: str):
         self.stdout.write("pysh: command not found: {}\n".format(line))
 
     def complete_help(self, *args):
