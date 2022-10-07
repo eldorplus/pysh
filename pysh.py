@@ -1,7 +1,7 @@
 from genericpath import isdir
 import platform
 import os
-import subprocess
+from urllib.error import HTTPError
 from utils.commands_list import *
 from utils.boyer_moore_algorithm import BoyerMooreAlgorithm
 import calendar
@@ -16,6 +16,7 @@ import dns.resolver
 import psutil
 import signal
 import urllib.request
+import urllib.parse
 
 
 class Pysh(cmd.Cmd):
@@ -520,9 +521,10 @@ class Pysh(cmd.Cmd):
         self.save_history("wget " + " ".join(url))
         if len(url) != 0:
             try:
-                with urllib.request.urlopen(url) as response, open(self.downloads_path + 'temp', 'wb') as out_file:
+                filename = urllib.parse.quote(url.split('/')[-1])
+                with urllib.request.urlopen(url) as response, open(self.downloads_path + filename, 'wb') as out_file:
                     shutil.copyfileobj(response, out_file)
-            except (urllib.error.HTTPError):
+            except(HTTPError): 
                 print("Internal Error")
         else:
             print("pysh: wget: incorrect usage: try 'wget [URL]'")
