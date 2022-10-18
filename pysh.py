@@ -315,8 +315,7 @@ class Pysh(cmd.Cmd):
                     file_details.append('Created: ' + str(time.ctime(
                         os.path.getctime(file))))
 
-                    print(', '.join(str(detail) for detail in file_details))
-                    print()
+                    print(', '.join(str(detail) for detail in file_details),end='\n')
                 except Exception as ex:
                     print(ex)
                     print("pysh: file: file '{}' does not exist or is inaccessible".format(
