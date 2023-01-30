@@ -1,7 +1,7 @@
 from genericpath import isdir
 import platform
 import os
-import subprocess
+from urllib.error import HTTPError
 from utils.commands_list import *
 from utils.boyer_moore_algorithm import BoyerMooreAlgorithm
 import calendar
@@ -16,6 +16,7 @@ import dns.resolver
 import psutil
 import signal
 import urllib.request
+import urllib.parse
 
 
 class Pysh(cmd.Cmd):
@@ -314,8 +315,7 @@ class Pysh(cmd.Cmd):
                     file_details.append('Created: ' + str(time.ctime(
                         os.path.getctime(file))))
 
-                    print(', '.join(str(detail) for detail in file_details))
-                    print()
+                    print(', '.join(str(detail) for detail in file_details),end='\n')
                 except Exception as ex:
                     print(ex)
                     print("pysh: file: file '{}' does not exist or is inaccessible".format(
@@ -502,11 +502,13 @@ class Pysh(cmd.Cmd):
         gen_args = args[0].split()
         self.save_history("ps " + " ".join(gen_args))
         if not gen_args:
+            print("{:<7} {:<50}".format('PID','NAME'))
+            print("---     ----")
             for proc in psutil.process_iter():
                 try:
                     process_name = proc.name()
                     process_id = proc.pid
-                    print(process_name, ":::", process_id)
+                    print("{:<7} {:<50}".format(process_id, process_name))
                 except (psutil.NoSuchProcess, psutil.AccessDenied, psutil.ZombieProcess):
                     print("Internal Error")
 
@@ -518,9 +520,10 @@ class Pysh(cmd.Cmd):
         self.save_history("wget " + " ".join(url))
         if len(url) != 0:
             try:
-                with urllib.request.urlopen(url) as response, open(self.downloads_path + 'temp', 'wb') as out_file:
+                filename = urllib.parse.quote(url.split('/')[-1])
+                with urllib.request.urlopen(url) as response, open(self.downloads_path + filename, 'wb') as out_file:
                     shutil.copyfileobj(response, out_file)
-            except (urllib.error.HTTPError):
+            except(HTTPError): 
                 print("Internal Error")
         else:
             print("pysh: wget: incorrect usage: try 'wget [URL]'")
@@ -935,7 +938,7 @@ class Pysh(cmd.Cmd):
     def help_link(self):
         print(commands_list_manual['link'])
 
-    def default(self, line: str) -> bool:
+    def default(self, line: str):
         self.stdout.write("pysh: command not found: {}\n".format(line))
 
     def complete_help(self, *args):
