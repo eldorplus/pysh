@@ -31,10 +31,10 @@ class Pysh(cmd.Cmd):
 
     if current_platform == 'Windows':
         home_path = 'C:/Users/' + getpass.getuser()
-        history_file_path = 'C:/Users/' + getpass.getuser() + '/history.txt'
+        history_file_path = 'C:/Users/' + getpass.getuser() + '/.pysh_history'
     else:
         home_path = '/home/' + getpass.getuser()
-        history_file_path = '/home/' + getpass.getuser() + '/history.txt'
+        history_file_path = '/home/' + getpass.getuser() + '/.pysh_history'
 
     downloads_path = home_path + '/Downloads/'
 
